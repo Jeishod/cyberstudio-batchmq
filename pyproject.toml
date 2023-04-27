@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "cyberstudio-batchmq"
+version = "0.1.0"
+description = ""
+authors = ["jeishod <jeishod@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "cyberstudio_batchmq"}]
+
+    [tool.poetry.dependencies]
+    python = "^3.11"
+    fastapi = "^0.95.1"
+    aio-pika = "^9.0.5"
+    sqlalchemy = "^2.0.9"
+    pandas = "^2.0.0"
+    asyncpg = "^0.27.0"
+    prometheus-client = "^0.16.0"
+    uvicorn = "^0.21.1"
+    python-dotenv = "^1.0.0"
+    dependency-injector = "^4.41.0"
+
+    [tool.poetry.group.dev.dependencies]
+    black = "^23.3.0"
+    pyproject-flake8 = "^6.0.0.post1"
+    mypy = "^1.2.0"
+    pylint = "^2.17.2"
+    pyright = "^1.1.304"
+    pytest-asyncio = "^0.21.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 10
+
+[tool.pylint]
+    [tool.pylint.messages_control]
+    disable = []
+
+    [tool.pylint.format]
+    max-line-length = "120"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.pytest]
+    [tool.pytest.ini_options]
+    minversion = "6.0"
+    addopts = "-s -vv"  # TODO: -ra
+    testpaths = [
+        "tests/unit",
+        "tests/integration",
+    ]
+    asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+
+[tool.pyright]
+pythonVersion = "3.11"
