@@ -7,7 +7,8 @@ from asyncio.tasks import Task
 from aio_pika.abc import AbstractQueue, AbstractChannel, AbstractRobustConnection
 
 from app.models import DBData
-from app.services.queue import BatchConsumer, RabbitMQParams
+from app.services.queue import BatchConsumer
+from app.services.queue.rabbitmq.settings import RabbitMQParams
 from app.services.services_base import ServiceBase
 
 

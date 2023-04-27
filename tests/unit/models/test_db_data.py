@@ -14,9 +14,10 @@ from app.models import DBData
 
 
 class TestDBData:
-    """ Формирование объектов, дробление """
+    """Формирование объектов, дробление"""
+
     def _make_incoming_message(self, body: bytes) -> IncomingMessage:
-        """ Подделка сообщения RabbitMQ """
+        """Подделка сообщения RabbitMQ"""
         deliver: Basic.Deliver = Basic.Deliver(
             consumer_tag=None,
             delivery_tag=None,
@@ -33,7 +34,7 @@ class TestDBData:
         return IncomingMessage(message=message)
 
     def _make_db_data_from_objects(self, objects: list[dict]) -> DBData:
-        """ Создание объекта DBData из списка словарей """
+        """Создание объекта DBData из списка словарей"""
         db_data: DBData = DBData(
             table_name="",
             objects=objects,
@@ -110,7 +111,7 @@ class TestDBData:
                     assert (int(statistics.mean(sizes)) - db_data_size) <= 1, f"{objects_count=}, {parts_count=}"
 
     def test_prepared_clear_empty(self) -> None:
-        """ Очистка значений от пустых полей """
+        """Очистка значений от пустых полей"""
         object_with_empty_value: dict = {
             "key_with_filled_value": "filled_value",
             "key_with_empty_value": None,
@@ -122,7 +123,7 @@ class TestDBData:
         assert "key_with_filled_value" in first_object, "Removed correct field"
 
     def test_prepared_fill_empty_created_at(self) -> None:
-        """ При наличии пустого created_at заполнение текущим временем """
+        """При наличии пустого created_at заполнение текущим временем"""
         object_with_empty_created_at: dict = {
             "key_with_filled_value": "filled_value",
             "created_at": None,
@@ -136,7 +137,7 @@ class TestDBData:
         assert first_object["created_at"] - datetime.now() < timedelta(seconds=1)
 
     def test_prepared_correct_pandas_timestamp(self) -> None:
-        """ Преобразование pandas.Timestamp в datetime """
+        """Преобразование pandas.Timestamp в datetime"""
         object_with_pandas_timestamp: dict = {
             "key_with_filled_value": "filled_value",
             "key_with_pandas_timestamp": pandas.Timestamp(datetime.now()),

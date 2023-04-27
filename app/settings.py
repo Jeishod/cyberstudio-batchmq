@@ -1,6 +1,6 @@
 from pydantic import BaseSettings
 
-from app.services.database import PostgreSQLParams
+from app.services.database.postgresql.postgresql import PostgreSQLParams
 from app.services.queue import RabbitMQParams
 
 

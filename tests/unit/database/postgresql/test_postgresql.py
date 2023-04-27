@@ -7,7 +7,8 @@ from app.services.database import (
 
 
 class TestPostgreSQL:
-    """ Проверка формирования данных перед вставкой в БД """
+    """Проверка формирования данных перед вставкой в БД"""
+
     postgresql: PostgreSQL
 
     @pytest.mark.parametrize(
@@ -20,13 +21,12 @@ class TestPostgreSQL:
         ],
     )
     def test_make_url(self, params_dict: dict, expected_url: str) -> None:
-        """ Проверка формирования строки подключения к БД PostgreSQL """
+        """Проверка формирования строки подключения к БД PostgreSQL"""
         default_params: dict = {
             "host": "anyhost",
             "port": 5342,
             "username": "admin",
             "password": "password",
-            "database": "my_database",
         }
         params: dict = default_params | params_dict
         connection_params: PgConnectionParams = PostgreSQLParams(**params)  # type: ignore

@@ -16,8 +16,9 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import declarative_base
 
+from app.services.database.postgresql.settings import PostgreSQLParams
 from app.services.services_base import ServiceBase
-from app.services.database import Database, PostgreSQLParams
+from app.services.database import Database
 from app.models import DBData
 
 
