@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "cyberstudio-batchmq"
 version = "0.1.0"
-description = ""
+description = "Custom description"
 authors = ["jeishod <jeishod@gmail.com>"]
 readme = "README.md"
 packages = [{ include = "cyberstudio_batchmq"}]
