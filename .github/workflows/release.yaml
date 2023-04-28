@@ -15,7 +15,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          release-type: node
+          release-type: python
           package-name: release-please-action
 
       - name: Group of log lines
