@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - main
+
+name: release-please
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: node
+          package-name: release-please-action
+
+      - name: Group of log lines
+        run: |
+            echo "Release created"
+            echo "${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}"
+        if: ${{ steps.release.outputs.release_created }}
