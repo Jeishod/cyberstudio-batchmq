@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/Jeishod/cyberstudio-batchmq/compare/v1.0.0...v2.0.0) (2023-05-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* add project description
+
+### Features
+
+* add project description ([94a05e9](https://github.com/Jeishod/cyberstudio-batchmq/commit/94a05e9eae74fac3d5f3d3147cf750eb5efbbe59))
+
 ## [1.0.0](https://github.com/Jeishod/cyberstudio-batchmq/compare/v0.1.0...v1.0.0) (2023-04-28)
 
 
