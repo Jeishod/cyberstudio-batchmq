@@ -1,0 +1,123 @@
+version: "3.9"
+
+networks:
+  cs-network:
+    name: cs-network
+
+volumes:
+  cs-batchmq-postgres-volume:
+    name: cs-batchmq-postgres-volume
+  cs-batchmq-rabbitmq-volume:
+    name: cs-batchmq-rabbitmq-volume
+
+x-logging:
+  # LOGGING
+  &formatted-logging
+  driver: json-file
+  options:
+    tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    max-size: "10m"
+    max-file: "3"
+    mode: "non-blocking"
+    max-buffer-size: "4m"
+
+x-batchmq-envs:
+  # BATCHMQ
+  &batchmq-envs
+  BATCHMQ_DEBUG: ${BATCHMQ_DEBUG}
+  BATCHMQ_APP_TITLE: ${BATCHMQ_APP_TITLE}
+  BATCHMQ_APP_DESCRIPTION: ${BATCHMQ_APP_DESCRIPTION}
+
+x-rabbitmq-envs:
+  # RABBITMQ
+  &rabbitmq-envs
+  BATCHMQ_MQ_HOST: ${BATCHMQ_MQ_HOST}
+  BATCHMQ_MQ_USERNAME: ${BATCHMQ_MQ_USERNAME}
+  BATCHMQ_MQ_PASSWORD: ${BATCHMQ_MQ_PASSWORD}
+  BATCHMQ_MQ_PORT: ${BATCHMQ_MQ_PORT}
+  BATCHMQ_MQ_QUEUES: ${BATCHMQ_MQ_QUEUES}
+  BATCHMQ_MQ_BATCHSIZE: ${BATCHMQ_MQ_BATCHSIZE}
+  BATCHMQ_MQ_PROCESS_INTERVAL_SEC: ${BATCHMQ_MQ_PROCESS_INTERVAL_SEC}
+
+x-postgres-envs:
+  # POSTGRES
+  &postgres-envs
+  BATCHMQ_PG_HOST: ${BATCHMQ_PG_HOST}
+  BATCHMQ_PG_PORT: ${BATCHMQ_PG_PORT}
+  BATCHMQ_PG_USERNAME: ${BATCHMQ_PG_USERNAME}
+  BATCHMQ_PG_PASSWORD: ${BATCHMQ_PG_PASSWORD}
+  BATCHMQ_PG_DATABASE: ${BATCHMQ_PG_DATABASE}
+  BATCHMQ_PG_ECHO_POOL: ${BATCHMQ_PG_ECHO_POOL}
+  BATCHMQ_PG_POOL_SIZE: ${BATCHMQ_PG_POOL_SIZE}
+  BATCHMQ_PG_CONNECTION_RETRY_PERIOD_SEC: ${BATCHMQ_PG_CONNECTION_RETRY_PERIOD_SEC}
+
+services:
+
+  cs-batchmq-postgres:
+    container_name: cs-batchmq-postgres
+    image: postgres:15.0-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${BATCHMQ_PG_USERNAME}
+      POSTGRES_PASSWORD: ${BATCHMQ_PG_PASSWORD}
+      POSTGRES_DB: ${BATCHMQ_PG_DATABASE}
+    healthcheck:
+      test: pg_isready --username=${BATCHMQ_PG_USERNAME} --dbname=${BATCHMQ_PG_DATABASE}
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${BATCHMQ_PG_EXPOSED_PORT:-5432}:5432"
+    volumes:
+      - cs-batchmq-postgres-volume:/var/lib/postgresql/data
+    networks:
+      - cs-network
+
+  cs-batchmq-rabbitmq:
+    container_name: cs-batchmq-rabbitmq
+    image: rabbitmq:3.11.2-management
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_PASS: ${BATCHMQ_MQ_USERNAME}
+      RABBITMQ_DEFAULT_USER: ${BATCHMQ_MQ_PASSWORD}
+    volumes:
+      - cs-batchmq-rabbitmq-volume:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${BATCHMQ_MQ_EXPOSED_PORT:-5672}:5672"
+      - "${BATCHMQ_MQ_UI_EXPOSED_PORT:-15672}:15672"
+    logging: *formatted-logging
+    networks:
+      - cs-network
+
+  cs-batchmq-dev:
+    container_name: cs-batchmq-dev
+    build:
+      target: dev
+      context: .
+      dockerfile: ./.deployment/dev.Dockerfile
+    image: cs-batchmq-dev
+    restart: always
+    environment:
+      <<: [*batchmq-envs, *rabbitmq-envs, *postgres-envs]
+    depends_on:
+      cs-batchmq-postgres:
+        condition: service_healthy
+      cs-batchmq-rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://0.0.0.0:8000
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${BATCHMQ_EXPOSED_PORT:-8000}:8000"
+    logging: *formatted-logging
+    volumes:
+      - ./app:/app/app
+    networks:
+      - cs-network
