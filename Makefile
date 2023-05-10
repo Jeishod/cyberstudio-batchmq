@@ -6,3 +6,6 @@ dev:
 format:
 	black app
 	pflake8 app
+
+up-dev:
+	@docker compose -f docker-compose.local.yaml up -d --build
